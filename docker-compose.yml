@@ -133,3 +133,5 @@ services:
             SPEC_URL: /openapi.json
         volumes:
             - ./openapi.json:/usr/share/nginx/html/openapi.json:ro
+        networks:
+            - main
