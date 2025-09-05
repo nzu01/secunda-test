@@ -6,7 +6,7 @@ networks:
         external: true
     local:
         driver: bridge
-    loodoman_sniper:
+    secunda:
         external: true
 
 
@@ -35,7 +35,7 @@ services:
         networks:
             - local
             - private
-            - loodoman_sniper
+            - secunda
     ### PHP-FPM ##############################################
     php-fpm:
         container_name: ${COMPOSE_PROJECT_NAME}_php-fpm
@@ -56,7 +56,7 @@ services:
         networks:
             - local
             - private
-            - loodoman_sniper
+            - secunda
 
     ## PHP Worker ############################################
     php-worker:
@@ -73,7 +73,7 @@ services:
         networks:
             - local
             - private
-            - loodoman_sniper
+            - secunda
     ### NGINX Server #########################################
     nginx:
         container_name: ${COMPOSE_PROJECT_NAME}_nginx

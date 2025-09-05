@@ -1,61 +1,139 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# README
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Проект: **Organizations API**  
+Бэкенд на Laravel + Docker.  
+Документация API — **ReDoc**.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Быстрый старт
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 1) Клонирование репозитория
+```bash
+git clone https://github.com/nzu01/secunda-test.git organizations-api
+cd organizations-api
+```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 2) Настройка окружения
+Скопируйте пример переменных окружения и при необходимости поправьте значения:
+```bash
+cp .env.example .env
+```
 
-## Learning Laravel
+> Обратите внимание на параметры подключения к БД в `.env` (порт по умолчанию в docker — **5458**).
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 3) Запуск Docker
+- Для локальной разработки используйте **docker-compose-dev**:
+  ```bash
+  docker compose -f docker-compose-dev.yml up -d
+  ```
+- Для прода (или максимально приближённого окружения) используйте **docker-compose**:
+  ```bash
+  docker compose -f docker-compose.yml up -d
+  ```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+> Если у вас один файл и он называется `docker-compose.yml`, можно запускать короче:  
+> `docker compose up -d`
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 4) Установка зависимостей и подготовка базы
+Зайдите в контейнер рабочего окружения:
+```bash
+docker compose exec workspace bash
+```
 
-## Laravel Sponsors
+Внутри контейнера:
+```bash
+composer install
+php artisan migrate
+php artisan db:seed
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Готово ✅
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Доступы по портам
 
-## Contributing
+- **API**: http://localhost:**8280**
+- **Документация (ReDoc)**: http://localhost:**8080**
+- **Postgres**: localhost:**5458**
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## Кэширование
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Почти все методы API завернуты в кэш.  
+Чтобы сбросить кэш:
+```bash
+php artisan cache:clear
+```
 
-## Security Vulnerabilities
+> Команда выполняется внутри контейнера `workspace`. Если вы вне контейнера, сначала войдите:
+> ```bash
+> docker compose exec workspace bash
+> ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## Полезные команды
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- Пересобрать контейнеры после изменений:
+  ```bash
+  docker compose build --no-cache
+  docker compose up -d
+  ```
+- Просмотреть логи приложения:
+  ```bash
+  docker compose logs -f workspace
+  ```
+- Выполнить artisan/команды без входа в bash:
+  ```bash
+  docker compose exec workspace php artisan <команда>
+  ```
+
+---
+
+## Типичные проблемы и решения
+
+- **Порт занят**  
+  Если 8280/8080/5458 заняты — измените порты в `docker-compose(-dev).yml` и/или в `.env`.
+
+- **Нет доступа к БД / миграции падают**  
+  Проверьте переменные в `.env`:
+  ```
+  DB_CONNECTION=pgsql
+  DB_HOST=db
+  DB_PORT=5432
+  DB_DATABASE=app
+  DB_USERNAME=app
+  DB_PASSWORD=app
+  ```
+  Внешний порт 5458 проброшен на контейнерный 5432 — это нормально.
+
+- **Composer вылетает по памяти**  
+  Запускайте `composer install` внутри контейнера `workspace`. Если всё равно не хватает — в крайнем случае:
+  ```bash
+  COMPOSER_ALLOW_SUPERUSER=1 composer install
+  ```
+
+---
+
+## Структура Docker
+
+- `docker-compose-dev.yml` — конфигурация для локалки (hot-reload, удобные volume’ы и т.п.).
+- `docker-compose.yml` — конфигурация для прод-сборки/деплоя.
+- Сервис `workspace` — PHP/Laravel окружение для разработки и выполнения команд.
+- Сервис `redoc` — статическая выдача документации OpenAPI (порт 8080).
+- Сервис `db` — PostgreSQL (в контейнере 5432, наружу проброшен на 5458).
+
+---
+
+## Документация API
+
+Файл OpenAPI (`openapi.yaml`) монтируется в контейнер ReDoc и доступен по:  
+**http://localhost:8080**
+
+> Если вы обновляете `openapi.yaml`, ReDoc обновится при перезапуске контейнера `redoc`:
+> ```bash
+> docker compose restart redoc
+> ```
