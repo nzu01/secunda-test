@@ -126,7 +126,7 @@ services:
 
     redoc:
         image: redocly/redoc
-        container_name: redoc
+        container_name: ${COMPOSE_PROJECT_NAME}_redoc
         expose:
             - 80
         environment:
