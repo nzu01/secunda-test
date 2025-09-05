@@ -1,0 +1,20 @@
+stages:
+  - build
+#  - push
+
+build-prod:
+  stage: build
+  tags:
+    - ssh
+  only:
+    - /^prod-.*$/
+  script:
+    -  cd /root/projects
+    -  git -C secunda pull || git clone git@gitlab.nzu-industries.ru:nzulfigarov/secunda-test.git secunda
+    -  cd secunda
+    -  chmod -R 777 storage
+    -  docker compose build
+    -  docker compose down
+    -  docker compose up -d
+    -  docker compose exec workspace composer install
+    -  docker compose exec workspace php artisan migrate --force

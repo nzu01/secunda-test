@@ -1,0 +1,1014 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Organizations API",
+    "version": "1.0.0",
+    "description": "REST API для работы с организациями, зданиями и типами организаций.\nВо всех примерах для коллекций возвращён **один объект** для краткости.\n"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8280"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Organizations",
+      "description": "Методы работы с организациями"
+    },
+    {
+      "name": "Buildings",
+      "description": "Методы работы со зданиями"
+    },
+    {
+      "name": "Organization Types",
+      "description": "Методы работы с типами организаций"
+    }
+  ],
+  "components": {
+    "parameters": {
+      "OffsetParam": {
+        "name": "offset",
+        "in": "query",
+        "description": "Смещение выборки",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        }
+      },
+      "LimitParam": {
+        "name": "limit",
+        "in": "query",
+        "description": "Лимит записей",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      }
+    },
+    "schemas": {
+      "DateTimeISO": {
+        "type": "string",
+        "format": "date-time",
+        "example": "2025-09-05T20:41:00+00:00"
+      },
+      "UUID": {
+        "type": "string",
+        "format": "uuid",
+        "example": "63587d49-ee3c-499e-a260-5c0dd39ae133"
+      },
+      "Building": {
+        "type": "object",
+        "required": [
+          "id",
+          "uuid",
+          "address",
+          "latitude",
+          "longitude",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 20
+          },
+          "uuid": {
+            "$ref": "#/components/schemas/UUID"
+          },
+          "address": {
+            "type": "string",
+            "example": "ул. Нобеля, 7, Москва, 143026"
+          },
+          "latitude": {
+            "type": "number",
+            "format": "float",
+            "example": 55.698697
+          },
+          "longitude": {
+            "type": "number",
+            "format": "float",
+            "example": 37.368379
+          },
+          "created_at": {
+            "$ref": "#/components/schemas/DateTimeISO"
+          },
+          "updated_at": {
+            "$ref": "#/components/schemas/DateTimeISO"
+          }
+        }
+      },
+      "OrganizationTypePivot": {
+        "type": "object",
+        "properties": {
+          "organization_uuid": {
+            "$ref": "#/components/schemas/UUID"
+          },
+          "organization_type_uuid": {
+            "$ref": "#/components/schemas/UUID"
+          }
+        }
+      },
+      "OrganizationType": {
+        "type": "object",
+        "required": [
+          "uuid",
+          "title",
+          "name",
+          "children"
+        ],
+        "properties": {
+          "uuid": {
+            "$ref": "#/components/schemas/UUID"
+          },
+          "title": {
+            "type": "string",
+            "example": "Еда"
+          },
+          "name": {
+            "type": "string",
+            "example": "food"
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrganizationType"
+            }
+          }
+        }
+      },
+      "OrganizationTypeWithPivot": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/OrganizationType"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "pivot": {
+                "$ref": "#/components/schemas/OrganizationTypePivot"
+              }
+            }
+          }
+        ]
+      },
+      "OrganizationContact": {
+        "type": "object",
+        "required": [
+          "id",
+          "uuid",
+          "organization_uuid",
+          "contact_type",
+          "value",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1457
+          },
+          "uuid": {
+            "$ref": "#/components/schemas/UUID"
+          },
+          "organization_uuid": {
+            "$ref": "#/components/schemas/UUID"
+          },
+          "contact_type": {
+            "type": "string",
+            "example": "phone"
+          },
+          "value": {
+            "type": "string",
+            "example": "+1.628.395.2762"
+          },
+          "created_at": {
+            "$ref": "#/components/schemas/DateTimeISO"
+          },
+          "updated_at": {
+            "$ref": "#/components/schemas/DateTimeISO"
+          }
+        }
+      },
+      "Organization": {
+        "type": "object",
+        "required": [
+          "id",
+          "uuid",
+          "title",
+          "building_uuid",
+          "created_at",
+          "updated_at",
+          "building",
+          "types",
+          "organization_contacts"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 981
+          },
+          "uuid": {
+            "$ref": "#/components/schemas/UUID"
+          },
+          "title": {
+            "type": "string",
+            "example": "Incidunt magnam incidunt."
+          },
+          "building_uuid": {
+            "$ref": "#/components/schemas/UUID"
+          },
+          "created_at": {
+            "$ref": "#/components/schemas/DateTimeISO"
+          },
+          "updated_at": {
+            "$ref": "#/components/schemas/DateTimeISO"
+          },
+          "building": {
+            "$ref": "#/components/schemas/Building"
+          },
+          "types": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrganizationTypeWithPivot"
+            }
+          },
+          "organization_contacts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrganizationContact"
+            }
+          }
+        }
+      },
+      "OrganizationsResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Organization"
+            }
+          }
+        }
+      },
+      "OrganizationResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Organization"
+          }
+        }
+      },
+      "BuildingsResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Building"
+            }
+          }
+        }
+      },
+      "OrganizationTypesResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrganizationType"
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/v1/organizations/by-type-title-with-descendants": {
+      "get": {
+        "tags": [
+          "Organizations"
+        ],
+        "summary": "Список организаций по названию типа (с потомками)",
+        "parameters": [
+          {
+            "name": "title",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Часть названия типа (например, \"Молочная\")"
+          },
+          {
+            "$ref": "#/components/parameters/OffsetParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationsResponse"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "data": [
+                        {
+                          "id": 981,
+                          "uuid": "f325b6d1-640f-4008-bca7-179e6132875f",
+                          "title": "Incidunt magnam incidunt.",
+                          "building_uuid": "63587d49-ee3c-499e-a260-5c0dd39ae133",
+                          "created_at": "2025-09-05T20:41:00+00:00",
+                          "updated_at": "2025-09-05T20:41:00+00:00",
+                          "building": {
+                            "id": 20,
+                            "uuid": "63587d49-ee3c-499e-a260-5c0dd39ae133",
+                            "address": "ул. Нобеля, 7, Москва, 143026",
+                            "latitude": 55.698697,
+                            "longitude": 37.368379,
+                            "created_at": "2025-09-05T20:40:58+00:00",
+                            "updated_at": "2025-09-05T20:40:58+00:00"
+                          },
+                          "types": [
+                            {
+                              "uuid": "09288055-dd95-4d4f-b460-dc2094329c20",
+                              "title": "Молочная продукция",
+                              "name": "milk",
+                              "children": [],
+                              "pivot": {
+                                "organization_uuid": "f325b6d1-640f-4008-bca7-179e6132875f",
+                                "organization_type_uuid": "09288055-dd95-4d4f-b460-dc2094329c20"
+                              }
+                            },
+                            {
+                              "uuid": "92037567-e638-460b-a8e8-b926b1185113",
+                              "title": "Здравоохранение",
+                              "name": "health",
+                              "children": [],
+                              "pivot": {
+                                "organization_uuid": "f325b6d1-640f-4008-bca7-179e6132875f",
+                                "organization_type_uuid": "92037567-e638-460b-a8e8-b926b1185113"
+                              }
+                            }
+                          ],
+                          "organization_contacts": [
+                            {
+                              "id": 1457,
+                              "uuid": "29483196-837d-4407-bdcd-b95105828eab",
+                              "organization_uuid": "f325b6d1-640f-4008-bca7-179e6132875f",
+                              "contact_type": "phone",
+                              "value": "818.733.5475",
+                              "created_at": "2025-09-05T20:41:00+00:00",
+                              "updated_at": "2025-09-05T20:41:00+00:00"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/organizations/by-type-with-descendants/{type_uuid}": {
+      "get": {
+        "tags": [
+          "Organizations"
+        ],
+        "summary": "Список организаций по UUID типа (с потомками)",
+        "parameters": [
+          {
+            "name": "type_uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UUID"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/OffsetParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationsResponse"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "data": [
+                        {
+                          "id": 962,
+                          "uuid": "b6fb1d6b-c46b-41f0-bf27-d4c9ebb3733c",
+                          "title": "Voluptatem eaque.",
+                          "building_uuid": "63587d49-ee3c-499e-a260-5c0dd39ae133",
+                          "created_at": "2025-09-05T20:41:00+00:00",
+                          "updated_at": "2025-09-05T20:41:00+00:00",
+                          "building": {
+                            "id": 20,
+                            "uuid": "63587d49-ee3c-499e-a260-5c0dd39ae133",
+                            "address": "ул. Нобеля, 7, Москва, 143026",
+                            "latitude": 55.698697,
+                            "longitude": 37.368379,
+                            "created_at": "2025-09-05T20:40:58+00:00",
+                            "updated_at": "2025-09-05T20:40:58+00:00"
+                          },
+                          "types": [
+                            {
+                              "uuid": "160d1976-8712-4e1b-b9e6-2fadc72f7bc0",
+                              "title": "Легковые",
+                              "name": "light",
+                              "children": [],
+                              "pivot": {
+                                "organization_uuid": "b6fb1d6b-c46b-41f0-bf27-d4c9ebb3733c",
+                                "organization_type_uuid": "160d1976-8712-4e1b-b9e6-2fadc72f7bc0"
+                              }
+                            },
+                            {
+                              "uuid": "3b3de3ed-d660-4100-805f-311e4468f05f",
+                              "title": "Автомобили",
+                              "name": "cars",
+                              "children": [],
+                              "pivot": {
+                                "organization_uuid": "b6fb1d6b-c46b-41f0-bf27-d4c9ebb3733c",
+                                "organization_type_uuid": "3b3de3ed-d660-4100-805f-311e4468f05f"
+                              }
+                            }
+                          ],
+                          "organization_contacts": [
+                            {
+                              "id": 1429,
+                              "uuid": "26d22990-2f17-4775-9729-9eb1b5aada3e",
+                              "organization_uuid": "b6fb1d6b-c46b-41f0-bf27-d4c9ebb3733c",
+                              "contact_type": "phone",
+                              "value": "1-863-359-3116",
+                              "created_at": "2025-09-05T20:41:00+00:00",
+                              "updated_at": "2025-09-05T20:41:00+00:00"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/organizations/by-type/{type_uuid}": {
+      "get": {
+        "tags": [
+          "Organizations"
+        ],
+        "summary": "Список организаций по UUID типа (без потомков)",
+        "parameters": [
+          {
+            "name": "type_uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UUID"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/OffsetParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationsResponse"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "data": [
+                        {
+                          "id": 524,
+                          "uuid": "08918c68-c2db-4bad-88c5-880154504a2b",
+                          "title": "Deserunt eaque vel.",
+                          "building_uuid": "0abad4ea-120a-4803-b0db-7f15df5f64d6",
+                          "created_at": "2025-09-05T20:40:59+00:00",
+                          "updated_at": "2025-09-05T20:40:59+00:00",
+                          "building": {
+                            "id": 9,
+                            "uuid": "0abad4ea-120a-4803-b0db-7f15df5f64d6",
+                            "address": "проспект Мира, 119, Москва, 129223",
+                            "latitude": 55.829953,
+                            "longitude": 37.633364,
+                            "created_at": "2025-09-05T20:40:58+00:00",
+                            "updated_at": "2025-09-05T20:40:58+00:00"
+                          },
+                          "types": [
+                            {
+                              "uuid": "3b3de3ed-d660-4100-805f-311e4468f05f",
+                              "title": "Автомобили",
+                              "name": "cars",
+                              "children": [],
+                              "pivot": {
+                                "organization_uuid": "08918c68-c2db-4bad-88c5-880154504a2b",
+                                "organization_type_uuid": "3b3de3ed-d660-4100-805f-311e4468f05f"
+                              }
+                            }
+                          ],
+                          "organization_contacts": [
+                            {
+                              "id": 795,
+                              "uuid": "20694319-ae3f-4c28-9185-4c7af849bc41",
+                              "organization_uuid": "08918c68-c2db-4bad-88c5-880154504a2b",
+                              "contact_type": "phone",
+                              "value": "(669) 654-0592",
+                              "created_at": "2025-09-05T20:40:59+00:00",
+                              "updated_at": "2025-09-05T20:40:59+00:00"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/organizations/{uuid}": {
+      "get": {
+        "tags": [
+          "Organizations"
+        ],
+        "summary": "Получить организацию по UUID",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UUID"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationResponse"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "data": {
+                        "id": 10,
+                        "uuid": "047be141-e143-4716-bbb3-e07d19f938b9",
+                        "title": "Iure modi alias.",
+                        "building_uuid": "3766b5ee-e78e-42e1-bf03-c50471ea3ab7",
+                        "created_at": "2025-09-05T20:40:58+00:00",
+                        "updated_at": "2025-09-05T20:40:58+00:00",
+                        "building": {
+                          "id": 18,
+                          "uuid": "3766b5ee-e78e-42e1-bf03-c50471ea3ab7",
+                          "address": "Космодамианская наб., 52, стр. 8, Москва, 115054",
+                          "latitude": 55.732972,
+                          "longitude": 37.644781,
+                          "created_at": "2025-09-05T20:40:58+00:00",
+                          "updated_at": "2025-09-05T20:40:58+00:00"
+                        },
+                        "types": [
+                          {
+                            "uuid": "09288055-dd95-4d4f-b460-dc2094329c20",
+                            "title": "Молочная продукция",
+                            "name": "milk",
+                            "children": [],
+                            "pivot": {
+                              "organization_uuid": "047be141-e143-4716-bbb3-e07d19f938b9",
+                              "organization_type_uuid": "09288055-dd95-4d4f-b460-dc2094329c20"
+                            }
+                          }
+                        ],
+                        "organization_contacts": [
+                          {
+                            "id": 14,
+                            "uuid": "b9cae429-29f5-411a-90b3-233655cbaecf",
+                            "organization_uuid": "047be141-e143-4716-bbb3-e07d19f938b9",
+                            "contact_type": "phone",
+                            "value": "(619) 388-7509",
+                            "created_at": "2025-09-05T20:40:58+00:00",
+                            "updated_at": "2025-09-05T20:40:58+00:00"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/organizations/search-by-title": {
+      "get": {
+        "tags": [
+          "Organizations"
+        ],
+        "summary": "Поиск организаций по части названия",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Поисковая строка (например, \"Perspiciatis\")"
+          },
+          {
+            "$ref": "#/components/parameters/OffsetParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationsResponse"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "data": [
+                        {
+                          "id": 470,
+                          "uuid": "11a14198-32c4-409a-af1e-e318a42b9f58",
+                          "title": "Excepturi ipsam perspiciatis.",
+                          "building_uuid": "63587d49-ee3c-499e-a260-5c0dd39ae133",
+                          "created_at": "2025-09-05T20:40:59+00:00",
+                          "updated_at": "2025-09-05T20:40:59+00:00",
+                          "building": {
+                            "id": 20,
+                            "uuid": "63587d49-ee3c-499e-a260-5c0dd39ae133",
+                            "address": "ул. Нобеля, 7, Москва, 143026",
+                            "latitude": 55.698697,
+                            "longitude": 37.368379,
+                            "created_at": "2025-09-05T20:40:58+00:00",
+                            "updated_at": "2025-09-05T20:40:58+00:00"
+                          },
+                          "types": [
+                            {
+                              "uuid": "43c79250-7724-46ba-b09f-bf5f22cf8414",
+                              "title": "Грузовые",
+                              "name": "trucks",
+                              "children": [],
+                              "pivot": {
+                                "organization_uuid": "11a14198-32c4-409a-af1e-e318a42b9f58",
+                                "organization_type_uuid": "43c79250-7724-46ba-b09f-bf5f22cf8414"
+                              }
+                            }
+                          ],
+                          "organization_contacts": [
+                            {
+                              "id": 714,
+                              "uuid": "e59a5950-2ebc-49f5-8877-ceb741410f7b",
+                              "organization_uuid": "11a14198-32c4-409a-af1e-e318a42b9f58",
+                              "contact_type": "phone",
+                              "value": "364-474-6903",
+                              "created_at": "2025-09-05T20:40:59+00:00",
+                              "updated_at": "2025-09-05T20:40:59+00:00"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/organizations/within-radius": {
+      "get": {
+        "tags": [
+          "Organizations"
+        ],
+        "summary": "Список организаций в радиусе от координаты",
+        "parameters": [
+          {
+            "name": "lat",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "float"
+            },
+            "description": "Широта"
+          },
+          {
+            "name": "lng",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "float"
+            },
+            "description": "Долгота"
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "float"
+            },
+            "description": "Радиус в метрах"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationsResponse"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "data": [
+                        {
+                          "id": 10,
+                          "uuid": "047be141-e143-4716-bbb3-e07d19f938b9",
+                          "title": "Iure modi alias.",
+                          "building_uuid": "3766b5ee-e78e-42e1-bf03-c50471ea3ab7",
+                          "created_at": "2025-09-05T20:40:58+00:00",
+                          "updated_at": "2025-09-05T20:40:58+00:00",
+                          "building": {
+                            "id": 18,
+                            "uuid": "3766b5ee-e78e-42e1-bf03-c50471ea3ab7",
+                            "address": "Космодамианская наб., 52, стр. 8, Москва, 115054",
+                            "latitude": 55.732972,
+                            "longitude": 37.644781,
+                            "created_at": "2025-09-05T20:40:58+00:00",
+                            "updated_at": "2025-09-05T20:40:58+00:00"
+                          },
+                          "types": [
+                            {
+                              "uuid": "09288055-dd95-4d4f-b460-dc2094329c20",
+                              "title": "Молочная продукция",
+                              "name": "milk",
+                              "children": [],
+                              "pivot": {
+                                "organization_uuid": "047be141-e143-4716-bbb3-e07d19f938b9",
+                                "organization_type_uuid": "09288055-dd95-4d4f-b460-dc2094329c20"
+                              }
+                            },
+                            {
+                              "uuid": "9922dd52-3898-4bfb-a47e-4399d0114531",
+                              "title": "Аксессуары",
+                              "name": "trucks_accessories",
+                              "children": [],
+                              "pivot": {
+                                "organization_uuid": "047be141-e143-4716-bbb3-e07d19f938b9",
+                                "organization_type_uuid": "9922dd52-3898-4bfb-a47e-4399d0114531"
+                              }
+                            }
+                          ],
+                          "organization_contacts": [
+                            {
+                              "id": 14,
+                              "uuid": "b9cae429-29f5-411a-90b3-233655cbaecf",
+                              "organization_uuid": "047be141-e143-4716-bbb3-e07d19f938b9",
+                              "contact_type": "phone",
+                              "value": "(619) 388-7509",
+                              "created_at": "2025-09-05T20:40:58+00:00",
+                              "updated_at": "2025-09-05T20:40:58+00:00"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/organizations/by-building/{building_uuid}": {
+      "get": {
+        "tags": [
+          "Organizations"
+        ],
+        "summary": "Список организаций по UUID здания",
+        "parameters": [
+          {
+            "name": "building_uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UUID"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/OffsetParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationsResponse"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "data": [
+                        {
+                          "id": 992,
+                          "uuid": "5d684701-129b-449f-8c00-900dd4bdfbe8",
+                          "title": "Sed quasi voluptas.",
+                          "building_uuid": "63587d49-ee3c-499e-a260-5c0dd39ae133",
+                          "created_at": "2025-09-05T20:41:00+00:00",
+                          "updated_at": "2025-09-05T20:41:00+00:00",
+                          "building": {
+                            "id": 20,
+                            "uuid": "63587d49-ee3c-499e-a260-5c0dd39ae133",
+                            "address": "ул. Нобеля, 7, Москва, 143026",
+                            "latitude": 55.698697,
+                            "longitude": 37.368379,
+                            "created_at": "2025-09-05T20:40:58+00:00",
+                            "updated_at": "2025-09-05T20:40:58+00:00"
+                          },
+                          "types": [
+                            {
+                              "uuid": "9922dd52-3898-4bfb-a47e-4399d0114531",
+                              "title": "Аксессуары",
+                              "name": "trucks_accessories",
+                              "children": [],
+                              "pivot": {
+                                "organization_uuid": "5d684701-129b-449f-8c00-900dd4bdfbe8",
+                                "organization_type_uuid": "9922dd52-3898-4bfb-a47e-4399d0114531"
+                              }
+                            }
+                          ],
+                          "organization_contacts": [
+                            {
+                              "id": 1473,
+                              "uuid": "5357bf1e-56e5-4d63-8de4-117ff53f9685",
+                              "organization_uuid": "5d684701-129b-449f-8c00-900dd4bdfbe8",
+                              "contact_type": "phone",
+                              "value": "551.318.1172",
+                              "created_at": "2025-09-05T20:41:00+00:00",
+                              "updated_at": "2025-09-05T20:41:00+00:00"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/buildings": {
+      "get": {
+        "tags": [
+          "Buildings"
+        ],
+        "summary": "Список зданий",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OffsetParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuildingsResponse"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "data": [
+                        {
+                          "id": 20,
+                          "uuid": "63587d49-ee3c-499e-a260-5c0dd39ae133",
+                          "address": "ул. Нобеля, 7, Москва, 143026",
+                          "latitude": 55.698697,
+                          "longitude": 37.368379,
+                          "created_at": "2025-09-05T20:40:58+00:00",
+                          "updated_at": "2025-09-05T20:40:58+00:00"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/organization-types": {
+      "get": {
+        "tags": [
+          "Organization Types"
+        ],
+        "summary": "Дерево типов организаций",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationTypesResponse"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "data": [
+                        {
+                          "uuid": "3b3de3ed-d660-4100-805f-311e4468f05f",
+                          "title": "Автомобили",
+                          "name": "cars",
+                          "children": [
+                            {
+                              "uuid": "43c79250-7724-46ba-b09f-bf5f22cf8414",
+                              "title": "Грузовые",
+                              "name": "trucks",
+                              "children": [
+                                {
+                                  "uuid": "9922dd52-3898-4bfb-a47e-4399d0114531",
+                                  "title": "Аксессуары",
+                                  "name": "trucks_accessories",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

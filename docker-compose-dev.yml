@@ -1,0 +1,129 @@
+
+networks:
+  main:
+    external: true
+  local:
+    driver: bridge
+
+volumes:
+  composer:
+    driver: local
+
+
+services:
+
+  ### Workspace Utilities ##################################
+  workspace:
+    container_name: ${COMPOSE_PROJECT_NAME}_workspace
+    build:
+      context: ./docker/workspace
+      args:
+        - PUID=${PUID}
+        - PGID=${PGID}
+        - http_proxy
+        - https_proxy
+        - no_proxy
+    volumes:
+      - ./:/var/www
+      - composer:/root/.composer
+    tty: true
+    networks:
+      - local
+
+  ### PHP-FPM ##############################################
+  php-fpm:
+    container_name: ${COMPOSE_PROJECT_NAME}_php-fpm
+    build:
+      context: ./docker/php-fpm
+      args:
+        - PUID=${PUID}
+        - PGID=${PGID}
+        - http_proxy
+        - https_proxy
+        - no_proxy
+    volumes:
+      - ./:/var/www
+    expose:
+      - 9000
+    depends_on:
+      - workspace
+    networks:
+      - local
+
+
+  ## PHP Worker ############################################
+  php-worker:
+    container_name: ${COMPOSE_PROJECT_NAME}_php-worker
+    build:
+      context: ./docker/php-worker
+      args:
+        - PUID=${PUID}
+        - PGID=${PGID}
+    volumes:
+      - ./:/var/www
+    depends_on:
+      - workspace
+    networks:
+      - local
+
+  ### NGINX Server #########################################
+  nginx:
+    container_name: ${COMPOSE_PROJECT_NAME}_nginx
+    build:
+      context: ./docker/nginx
+      args:
+        - http_proxy
+        - https_proxy
+        - no_proxy
+    volumes:
+      - .:/var/www
+      - ./docker/logs/nginx/:/var/log/nginx
+      - ./docker/nginx/sites/:/etc/nginx/sites-available
+      - ./docker/nginx/ssl/:/etc/nginx/ssl
+    ports:
+      - "8280:80"
+    depends_on:
+      - php-fpm
+    networks:
+      - main
+      - local
+
+  ### Redis ################################################
+  redis:
+    container_name: ${COMPOSE_PROJECT_NAME}_redis
+    build: ./docker/redis
+    volumes:
+      - ./data/redis:/data
+    expose:
+      - 6379
+    networks:
+      - local
+
+
+
+  ### PostgreSQL ###########################################
+  postgres:
+    container_name: ${COMPOSE_PROJECT_NAME}_postgres
+    build:
+      context: ./docker/postgres
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+      - ./docker/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - "5458:5432"
+    environment:
+      - POSTGRES_DB=${DB_DATABASE}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    networks:
+      - local
+
+  redoc:
+    image: redocly/redoc
+    container_name: redoc
+    ports:
+      - "8080:80"
+    environment:
+      SPEC_URL: /openapi.json
+    volumes:
+      - ./openapi.json:/usr/share/nginx/html/openapi.json:ro

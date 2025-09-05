@@ -1,0 +1,95 @@
+
+networks:
+    main:
+        external: true
+    private:
+        external: true
+    local:
+        driver: bridge
+    loodoman_sniper:
+        external: true
+
+
+volumes:
+    composer:
+        driver: local
+
+
+services:
+
+    ### Workspace Utilities ##################################
+    workspace:
+        container_name: ${COMPOSE_PROJECT_NAME}_workspace
+        build:
+            context: ./docker/workspace
+            args:
+                - PUID=${PUID}
+                - PGID=${PGID}
+                - http_proxy
+                - https_proxy
+                - no_proxy
+        volumes:
+            - ./:/var/www
+            - composer:/root/.composer
+        tty: true
+        networks:
+            - local
+            - private
+            - loodoman_sniper
+    ### PHP-FPM ##############################################
+    php-fpm:
+        container_name: ${COMPOSE_PROJECT_NAME}_php-fpm
+        build:
+            context: ./docker/php-fpm
+            args:
+                - PUID=${PUID}
+                - PGID=${PGID}
+                - http_proxy
+                - https_proxy
+                - no_proxy
+        volumes:
+            - ./:/var/www
+        expose:
+            - 9000
+        depends_on:
+            - workspace
+        networks:
+            - local
+            - private
+            - loodoman_sniper
+
+    ## PHP Worker ############################################
+    php-worker:
+        container_name: ${COMPOSE_PROJECT_NAME}_php-worker
+        build:
+            context: ./docker/php-worker
+            args:
+                - PUID=${PUID}
+                - PGID=${PGID}
+        volumes:
+            - ./:/var/www
+        depends_on:
+            - workspace
+        networks:
+            - local
+            - private
+            - loodoman_sniper
+    ### NGINX Server #########################################
+    nginx:
+        container_name: ${COMPOSE_PROJECT_NAME}_nginx
+        build:
+            context: ./docker/nginx
+            args:
+                - http_proxy
+                - https_proxy
+                - no_proxy
+        volumes:
+            - .:/var/www
+            - ./docker/logs/nginx/:/var/log/nginx
+            - ./docker/nginx/sites/:/etc/nginx/sites-available
+            - ./docker/nginx/ssl/:/etc/nginx/ssl
+        depends_on:
+            - php-fpm
+        networks:
+            - main
+            - local
