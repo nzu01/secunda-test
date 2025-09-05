@@ -1,0 +1,395 @@
+{
+  "info": {
+    "name": "Secunda",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "GetTypes",
+      "event": [],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "41c86ea3-ea36-4855-af72-47e4225df069",
+            "disabled": false,
+            "type": "default"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "https://secunda-api.nzulfigarov.com/api/v1/organization-types",
+          "protocol": "https",
+          "host": [
+            "secunda-api",
+            "nzulfigarov",
+            "com"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "organization-types"
+          ],
+          "query": [],
+          "variable": []
+        }
+      }
+    },
+    {
+      "name": "GetBuildings",
+      "event": [],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "41c86ea3-ea36-4855-af72-47e4225df069",
+            "disabled": false,
+            "type": "default"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8280/api/v1/buildings",
+          "protocol": "http",
+          "host": [
+            "localhost:8280"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "buildings"
+          ],
+          "query": [],
+          "variable": []
+        }
+      }
+    },
+    {
+      "name": "Organizations",
+      "event": [],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "41c86ea3-ea36-4855-af72-47e4225df069",
+            "disabled": false,
+            "type": "default"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8280/api/v1/organizations/by-building/63587d49-ee3c-499e-a260-5c0dd39ae133",
+          "protocol": "http",
+          "host": [
+            "localhost:8280"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "organizations",
+            "by-building",
+            "63587d49-ee3c-499e-a260-5c0dd39ae133"
+          ],
+          "query": [],
+          "variable": []
+        }
+      }
+    },
+    {
+      "name": "Organizations By Type",
+      "event": [],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "41c86ea3-ea36-4855-af72-47e4225df069",
+            "disabled": false,
+            "type": "default"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8280/api/v1/organizations/by-type/3b3de3ed-d660-4100-805f-311e4468f05f?limit=1",
+          "protocol": "http",
+          "host": [
+            "localhost:8280"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "organizations",
+            "by-type",
+            "3b3de3ed-d660-4100-805f-311e4468f05f"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "1"
+            }
+          ],
+          "variable": []
+        }
+      }
+    },
+    {
+      "name": "Organizations Withing Radius",
+      "event": [],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "41c86ea3-ea36-4855-af72-47e4225df069",
+            "disabled": false,
+            "type": "default"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8280/api/v1/organizations/within-radius?lat=55.742039&lng=37.6536128&radius=1200",
+          "protocol": "http",
+          "host": [
+            "localhost:8280"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "organizations",
+            "within-radius"
+          ],
+          "query": [
+            {
+              "key": "lat",
+              "value": "55.742039"
+            },
+            {
+              "key": "lng",
+              "value": "37.6536128"
+            },
+            {
+              "key": "radius",
+              "value": "1200"
+            }
+          ],
+          "variable": []
+        }
+      }
+    },
+    {
+      "name": "Organizations By Title",
+      "event": [],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "41c86ea3-ea36-4855-af72-47e4225df069",
+            "disabled": false,
+            "type": "default"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8280/api/v1/organizations/search-by-title?q=Perspiciatis",
+          "protocol": "http",
+          "host": [
+            "localhost:8280"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "organizations",
+            "search-by-title"
+          ],
+          "query": [
+            {
+              "key": "q",
+              "value": "Perspiciatis"
+            }
+          ],
+          "variable": []
+        }
+      }
+    },
+    {
+      "name": "Organizations By Uuid",
+      "event": [],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "41c86ea3-ea36-4855-af72-47e4225df069",
+            "disabled": false,
+            "type": "default"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8280/api/v1/organizations/d6e1e171-f883-45a9-a645-281c15daf39e",
+          "protocol": "http",
+          "host": [
+            "localhost:8280"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "organizations",
+            "d6e1e171-f883-45a9-a645-281c15daf39e"
+          ],
+          "query": [],
+          "variable": []
+        }
+      }
+    },
+    {
+      "name": "Organizations By Type Uuid",
+      "event": [],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "41c86ea3-ea36-4855-af72-47e4225df069",
+            "disabled": false,
+            "type": "default"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8280/api/v1/organizations/by-type/3b3de3ed-d660-4100-805f-311e4468f05f?limit=1",
+          "protocol": "http",
+          "host": [
+            "localhost:8280"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "organizations",
+            "by-type",
+            "3b3de3ed-d660-4100-805f-311e4468f05f"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "1"
+            }
+          ],
+          "variable": []
+        }
+      }
+    },
+    {
+      "name": "Organizations By Type Uuid With Descendants",
+      "event": [],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "41c86ea3-ea36-4855-af72-47e4225df069",
+            "disabled": false,
+            "type": "default"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8280/api/v1/organizations/by-type-with-descendants/3b3de3ed-d660-4100-805f-311e4468f05f?limit=1",
+          "protocol": "http",
+          "host": [
+            "localhost:8280"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "organizations",
+            "by-type-with-descendants",
+            "3b3de3ed-d660-4100-805f-311e4468f05f"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "1"
+            }
+          ],
+          "variable": []
+        }
+      }
+    },
+    {
+      "name": "Organizations By Type Title With Descendants",
+      "event": [],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "41c86ea3-ea36-4855-af72-47e4225df069",
+            "disabled": false,
+            "type": "default"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8280/api/v1/organizations/by-type-title-with-descendants?title=Молочная&limit=10",
+          "protocol": "http",
+          "host": [
+            "localhost:8280"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "organizations",
+            "by-type-title-with-descendants"
+          ],
+          "query": [
+            {
+              "key": "title",
+              "value": "Молочная"
+            },
+            {
+              "key": "limit",
+              "value": "10"
+            }
+          ],
+          "variable": []
+        }
+      }
+    }
+  ],
+  "variable": []
+}
