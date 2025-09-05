@@ -137,3 +137,7 @@ php artisan cache:clear
 > ```bash
 > docker compose restart redoc
 > ```
+
+## Авторизация API
+Используйте header 
+`Authorization: 41c86ea3-ea36-4855-af72-47e4225df069`
